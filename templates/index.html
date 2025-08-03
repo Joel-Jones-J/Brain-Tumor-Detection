@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Detection</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Raleway:wght@300;400;500;700&family=Quicksand:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Variables for easy theme management */
+        :root {
+            --primary-green: #2ecc71; /* Emerald Green */
+            --dark-blue: #1a2c5b;
+            --accent-purple: #7b4397;
+            --light-blue-gradient-start: #e0eafc;
+            --light-blue-gradient-end: #cfdef3;
+            --container-bg: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
+            --text-color-light: #333;
+            --text-color-dark: #eee;
+            --input-border-light: #ccc;
+            --button-text-color: white;
+            --shadow-light: rgba(0,0,0,0.12);
+            --shadow-medium: rgba(0,0,0,0.25);
+            --shadow-heavy: rgba(0,0,0,0.4);
+            --quote-color-light: #666;
+            --quote-color-dark: #bbb;
+            --emergency-button-bg: #e74c3c; /* Red for emergency */
+            --emergency-button-shadow: rgba(231, 76, 60, 0.5);
+            --toggle-bg-light: #ddd;
+            --toggle-bg-dark: #555;
+            --toggle-handle-light: #fff;
+            --toggle-handle-dark: #2c3e50;
+
+            /* New specific colors for Detect Tumor button */
+            --detect-button-start: #28a745; /* A slightly darker green for gradient start */
+            --detect-button-end: #218838; /* Even darker green for gradient end */
+            --detect-button-hover-start: #218838;
+            --detect-button-hover-end: #1e7e34;
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e3a5f, #0f1c30), url("/static/bg.jpg"); /* Darker blue gradient with BG image */
+            background-size: cover;
+            background-position: center;
+            color: var(--text-color-dark);
+        }
+        body.dark-mode .container {
+            background-color: rgba(30, 30, 30, 0.95); /* Darker container */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 {
+            color: #f5f5f5; /* Lighter headings */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        body.dark-mode input[type="file"] {
+            color: var(--text-color-dark);
+            border-color: #555;
+        }
+        body.dark-mode input[type="file"]::file-selector-button {
+            background-color: #34495e;
+            color: #ecf0f1;
+            border-color: #34495e;
+        }
+        body.dark-mode #emergency-button,
+        body.dark-mode #dark-mode-toggle {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        body.dark-mode #emergency-button:hover,
+        body.dark-mode #dark-mode-toggle:hover {
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
+        }
+        body.dark-mode #preview {
+            border-color: #555;
+            background-color: #2a2a2a;
+        }
+        body.dark-mode .quote-text {
+            color: var(--quote-color-dark);
+        }
+        body.dark-mode #chatbot-container {
+             background: linear-gradient(135deg, #2c3e50, #34495e); /* Darker chatbot */
+             box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+             border-color: #444;
+        }
+        body.dark-mode #chatbot-container strong {
+            color: #d1b7e4; /* Lighter purple accent */
+        }
+        body.dark-mode #chatbox {
+            background-color: #1a1a1a;
+            border-color: #444;
+        }
+        body.dark-mode #chatbox div b {
+            color: #dcdcdc;
+        }
+        body.dark-mode #user-input {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #fefefe;
+        }
+        body.dark-mode #user-input::placeholder {
+            color: #aaa;
+        }
+        body.dark-mode #user-input:focus {
+            border-color: #d1b7e4;
+            box-shadow: 0 0 0 5px rgba(209, 183, 228, 0.4);
+        }
+        body.dark-mode #chatbot-container button {
+            background: linear-gradient(45deg, #8e44ad, #9b59b6); /* Darker purple button */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        body.dark-mode #chatbot-container button:hover {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+        /* Detect Tumor button dark mode */
+        body.dark-mode input[type="submit"] {
+            background: linear-gradient(45deg, #1e6c31, #185a29); /* Darker green for dark mode */
+        }
+        body.dark-mode input[type="submit"]:hover {
+            background: linear-gradient(45deg, #185a29, #1e6c31);
+        }
+
+
+        body {
+            background: url("/static/bg.jpg") no-repeat center center fixed; /* Your background image */
+            background-size: cover; /* Cover the entire viewport */
+            font-family: 'Raleway', sans-serif;
+            color: var(--text-color-light);
+            padding: 40px; /* Reduced overall padding for tighter layout */
+            display: flex;
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center horizontally */
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+            transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition for dark mode */
+        }
+
+        .header-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1001; /* Above everything */
+        }
+
+        #emergency-button, #dark-mode-toggle {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px var(--shadow-medium);
+            position: relative; /* Needed for ::before pseudo-element */
+            overflow: hidden; /* Needed for ::before pseudo-element */
+        }
+
+        #emergency-button {
+            background-color: var(--emergency-button-bg);
+            color: white;
+        }
+
+        /* Gradient animation for emergency button */
+        #emergency-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.15);
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+            z-index: 0;
+        }
+        #emergency-button:hover::before {
+            left: 100%;
+        }
+        #emergency-button span { /* To keep text above ::before */
+            position: relative;
+            z-index: 1;
+        }
+
+
+        #emergency-button:hover {
+            background-color: #c0392b;
+            box-shadow: 0 12px 25px var(--emergency-button-shadow);
+            transform: translateY(-3px);
+        }
+
+        #dark-mode-toggle {
+            background-color: var(--toggle-bg-light);
+            color: var(--text-color-light);
+            width: 80px; /* Fixed width for toggle */
+            height: 45px; /* Fixed height */
+            padding: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            overflow: hidden;
+            font-size: 1.4em; /* Icon size */
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        #dark-mode-toggle::before { /* Toggle handle */
+            content: '';
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            background-color: var(--toggle-handle-light);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            left: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        body.dark-mode #dark-mode-toggle::before {
+            left: calc(100% - 43px); /* Move to right */
+            background-color: var(--toggle-handle-dark);
+        }
+        body.dark-mode #dark-mode-toggle {
+            background-color: var(--toggle-bg-dark);
+            color: var(--text-color-dark);
+        }
+
+        .icon {
+            z-index: 1; /* Ensure icons are above handle */
+            line-height: 1; /* Remove extra line height */
+            color: #f1c40f; /* Sun color */
+            margin: 0 5px;
+        }
+        .icon.moon {
+            color: #95a5a6; /* Moon color */
+        }
+        body.dark-mode .icon.moon {
+            color: #f1c40f; /* Moon glows in dark mode */
+        }
+        body.dark-mode .icon.sun {
+            color: #95a5a6; /* Sun dims in dark mode */
+        }
+
+
+        .container {
+            background: var(--container-bg);
+            padding: 50px 60px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px var(--shadow-heavy);
+            max-width: 700px; /* Adjusted max-width for the main container */
+            width: 90%;
+            margin-top: 80px; /* Space for fixed buttons at top */
+            margin-right: 500px; /* ADDED: Space for chatbot on the right */
+            animation: slideInUp 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.8);
+            z-index: 1; /* Ensure container is above background shapes */
+            align-self: flex-start; /* Align container to the start (left) */
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(80px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: 120px; /* Larger logo */
+            height: 120px;
+            margin-bottom: 30px;
+            border-radius: 50%; /* Make it circular */
+            box-shadow: 0 8px 20px var(--shadow-medium); /* Shadow for logo */
+            transition: transform 0.3s ease-in-out;
+        }
+        .logo:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 3.8em; /* Even larger heading */
+            margin-bottom: 35px;
+            color: var(--dark-blue);
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.3); /* Stronger shadow */
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            transition: color 0.5s ease;
+        }
+
+        input[type="file"] {
+            display: block; /* Stack inputs */
+            margin: 30px auto 25px auto; /* More margin */
+            padding: 15px; /* Larger padding */
+            font-size: 1.1em;
+            border: 2px solid var(--input-border-light);
+            border-radius: 12px;
+            background-color: #f7f7f7;
+            color: var(--text-color-light);
+            width: calc(100% - 60px); /* Adjust width for padding */
+            max-width: 450px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.08); /* Subtle inner shadow */
+        }
+        input[type="file"]::-webkit-file-upload-button { /* Style for button part of file input */
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background-color: #27ae60;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        input[type="file"]:hover {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+        }
+
+        input[type="submit"] {
+            display: block;
+            margin: 40px auto 30px auto;
+            padding: 18px 45px; /* Larger button */
+            background: linear-gradient(45deg, var(--detect-button-start), var(--detect-button-end)); /* CHANGED: Green gradient for submit */
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 12px 25px var(--shadow-medium);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        input[type="submit"]::before { /* Shine effect */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.15);
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+        }
+        input[type="submit"]:hover::before {
+            left: 100%;
+        }
+        input[type="submit"]:hover {
+            background: linear-gradient(45deg, var(--detect-button-hover-start), var(--detect-button-hover-end)); /* CHANGED: Darker green on hover */
+            box-shadow: 0 18px 35px var(--shadow-heavy);
+            transform: translateY(-8px) scale(1.03);
+        }
+
+        .quote-text {
+            font-family: 'Quicksand', sans-serif; /* Use Quicksand for quote */
+            font-size: 1.4em; /* Larger quote font */
+            font-style: italic;
+            color: var(--quote-color-light);
+            margin-top: 50px; /* More space */
+            padding: 0 20px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            transition: color 0.5s ease;
+        }
+
+        #preview {
+            max-width: 80%;
+            height: auto;
+            margin-top: 25px;
+            border: 4px solid var(--primary-green);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            display: none; /* Hidden by default */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* NurseBot Chatbot Styling (copied from previous response) */
+        #chatbot-container {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 450px;
+            background: linear-gradient(135deg, #f0f8ff, #ffffff);
+            border-radius: 25px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.3);
+            padding: 30px;
+            border: 1px solid #e5e5e5;
+            font-family: 'Raleway', sans-serif;
+            animation: fadeInRight 1s cubic-bezier(0.23, 1, 0.32, 1) 0.8s forwards;
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        #chatbot-container img {
+            width: 90px;
+            height: auto;
+            margin-right: 25px;
+            border-radius: 50%;
+            border: 5px solid var(--accent-purple);
+            box-shadow: 0 0 20px rgba(123, 67, 151, 0.6);
+        }
+
+        #chatbot-container strong {
+            font-size: 28px;
+            color: var(--accent-purple);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        #chatbox {
+            height: 320px;
+            overflow-y: auto;
+            margin: 25px 0;
+            border: 1px solid #c0d4e9;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: #eaf4fd;
+            font-size: 17px;
+            line-height: 1.8;
+            scroll-behavior: smooth;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        #chatbox div {
+            margin-bottom: 12px;
+        }
+
+        #chatbox div b {
+            color: #34495e;
+            font-weight: 700;
+        }
+
+        #user-input {
+            width: calc(100% - 30px);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid #9bbdcf;
+            font-size: 18px;
+            margin-bottom: 20px;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+            background-color: #ffffff;
+        }
+
+        #user-input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 5px rgba(123, 67, 151, 0.4);
+            outline: none;
+        }
+
+        #chatbot-container button {
+            width: 100%;
+            padding: 18px 0;
+            background: linear-gradient(45deg, var(--accent-purple), #c33764);
+            border: none; /* Ensure no default button border */
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            margin-top: 20px;
+            cursor: pointer; /* Add cursor pointer */
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Add transition */
+            position: relative; /* For ::before */
+            overflow: hidden; /* For ::before */
+            color: white; /* Ensure text color is white */
+        }
+
+        #chatbot-container button::before { /* Shine effect for chatbot button */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.15);
+            transform: skewX(-30deg);
+            transition: all 0.5s ease;
+            z-index: 0;
+        }
+
+        #chatbot-container button:hover::before {
+            left: 100%;
+        }
+
+        #chatbot-container button:hover {
+            background: linear-gradient(45deg, #c33764, var(--accent-purple));
+            box-shadow: 0 15px 30px rgba(0,0,0,0.35);
+            transform: translateY(-5px) scale(1.01);
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 1200px) { /* Added breakpoint to push container more */
+            .container {
+                margin-right: 500px; /* Adjust based on chatbot width + desired gap */
+                align-self: center; /* Center vertically on large screens if desired, or keep flex-start */
+            }
+        }
+
+        @media (max-width: 992px) {
+            body {
+                padding: 30px 20px;
+                align-items: center; /* Center content on smaller screens */
+            }
+            .container {
+                max-width: 90%;
+                padding: 40px 30px;
+                margin-top: 60px; /* Adjust top margin for smaller screens */
+                margin-right: 0; /* Remove margin-right on smaller screens */
+                align-self: center; /* Center horizontally */
+            }
+            .header-buttons {
+                top: 15px;
+                right: 15px;
+                gap: 10px;
+            }
+            #emergency-button, #dark-mode-toggle {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            #dark-mode-toggle {
+                width: 70px;
+                height: 40px;
+                font-size: 1.2em;
+            }
+            #dark-mode-toggle::before {
+                width: 33px;
+                height: 33px;
+                left: 4px;
+            }
+            body.dark-mode #dark-mode-toggle::before {
+                left: calc(100% - 37px);
+            }
+
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+            h1 {
+                font-size: 2.8em;
+                margin-bottom: 25px;
+            }
+            input[type="file"] {
+                width: calc(100% - 40px); /* Adjust padding */
+                font-size: 1em;
+            }
+            input[type="file"]::-webkit-file-upload-button {
+                padding: 8px 15px;
+                margin-right: 10px;
+            }
+            input[type="submit"] {
+                padding: 15px 35px;
+                font-size: 1.1em;
+                margin: 30px auto 20px auto;
+            }
+            .quote-text {
+                font-size: 1.2em;
+                margin-top: 30px;
+            }
+
+            #chatbot-container {
+                width: 350px;
+                right: 15px;
+                bottom: 15px;
+                padding: 20px;
+                border-radius: 20px;
+            }
+            #chatbot-container img {
+                width: 70px;
+                margin-right: 15px;
+            }
+            #chatbot-container strong {
+                font-size: 24px;
+            }
+            #chatbox {
+                height: 250px;
+                padding: 15px;
+                font-size: 16px;
+            }
+            #user-input {
+                padding: 15px;
+                font-size: 16px;
+            }
+            #chatbot-container button {
+                padding: 15px 0;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+            .container {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+            .header-buttons {
+                flex-direction: column; /* Stack buttons vertically */
+                top: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+            #emergency-button, #dark-mode-toggle {
+                width: auto; /* Allow width to be determined by content */
+                min-width: 120px; /* Ensure a minimum width */
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+            #dark-mode-toggle {
+                height: 35px;
+                font-size: 1.1em;
+            }
+            #dark-mode-toggle::before {
+                width: 28px;
+                height: 28px;
+                left: 3px;
+            }
+            body.dark-mode #dark-mode-toggle::before {
+                left: calc(100% - 31px);
+            }
+
+            h1 {
+                font-size: 2.2em;
+                margin-bottom: 20px;
+            }
+            input[type="file"] {
+                width: calc(100% - 30px);
+                font-size: 0.95em;
+            }
+            input[type="file"]::-webkit-file-upload-button {
+                padding: 8px 15px;
+                margin-right: 10px;
+            }
+            input[type="submit"] {
+                padding: 12px 25px;
+                font-size: 1em;
+                margin: 25px auto 15px auto;
+            }
+            .quote-text {
+                font-size: 1em;
+                margin-top: 25px;
+            }
+            #chatbot-container {
+                width: 90%; /* Take up more width on small screens */
+                left: 5%; /* Center horizontally */
+                right: 5%;
+                bottom: 10px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+            #chatbot-container img {
+                width: 50px;
+                margin-right: 10px;
+            }
+            #chatbot-container strong {
+                font-size: 20px;
+            }
+            #chatbox {
+                height: 180px;
+                font-size: 14px;
+                padding: 12px;
+            }
+            #user-input {
+                padding: 12px;
+                font-size: 14px;
+            }
+            #chatbot-container button {
+                padding: 12px 0;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-buttons">
+        <button id="emergency-button" onclick="alert('Emergency Call: +91-9876543210')">
+            <span>🚑 Emergency</span>
+        </button>
+        <button id="dark-mode-toggle" onclick="toggleDarkMode()">
+            <span class="icon sun">☀️</span>
+            <span class="icon moon">🌙</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <img src="/static/logo.png" class="logo" alt="Logo">
+        <h1>Brain Tumor Detection</h1>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" id="imageInput" accept="image/*" required>
+            <img id="preview" src="#" alt="Image Preview">
+            <br>
+            <input type="submit" value="Detect Tumor">
+        </form>
+        <p class="quote-text">
+            "{{ quote }}"
+        </p>
+    </div>
+
+    <div id="chatbot-container">
+        <div style="display:flex; align-items:center;">
+            <img src="{{ url_for('static', filename='nurse_avatar.gif') }}" alt="Nurse Avatar">
+            <strong>NurseBot</strong>
+        </div>
+        <div id="chatbox"></div>
+        <input type="text" id="user-input" placeholder="Type your question...">
+        <button onclick="sendMessage()">Ask</button>
+    </div>
+
+    <script>
+        // Image Preview Script
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const [file] = event.target.files;
+            if (file) {
+                const preview = document.getElementById('preview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block'; // Show the image preview
+            }
+        });
+
+        // Dark Mode Toggle Script
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            // Save user preference
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        }
+
+        // Apply dark mode on page load if preferred
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+
+        // NurseBot Chatbot Script
+        async function sendMessage() {
+            const input = document.getElementById("user-input").value;
+            if (!input.trim()) return;
+
+            const chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<div><b>You:</b> ${input}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to bottom after user message
+
+            const res = await fetch('/ask_chatbot', {
+                method: 'POST',
+                body: JSON.stringify({ question: input }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await res.json();
+            const reply = data.answer;
+
+            chatbox.innerHTML += `<div><b>NurseBot:</b> ${reply}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to bottom after bot message
+
+            // Voice output (adjust lang as needed, 'en-US' for English, 'ta-IN' for Tamil)
+            const utterance = new SpeechSynthesisUtterance(reply);
+            utterance.lang = 'ta-IN'; // Set to Tamil as per previous instruction
+            speechSynthesis.speak(utterance);
+
+            document.getElementById("user-input").value = '';
+        }
+    </script>
+</body>
+</html>

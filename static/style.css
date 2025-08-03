@@ -1,0 +1,74 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: url("/static/images/hospital_bg.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+body {
+    margin: 0;
+    padding: 0;
+    background: url('../static/images/hospital_bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+}
+
+.result-container {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.7); /* dark overlay */
+    border-radius: 20px;
+    box-shadow: 0 0 20px cyan;
+    text-align: center;
+}
+
+.result-container h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #00e5ff;
+}
+
+.suggestions ul {
+    list-style: square inside;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.suggestions h2 {
+    color: #00ffb3;
+}
+
+.doctor {
+    margin-top: 20px;
+    background-color: rgba(0, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.quote {
+    margin-top: 30px;
+    font-style: italic;
+    color: #ffc107;
+}
+
+.back-button,
+.pdf-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 25px;
+    background-color: #00e5ff;
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.back-button:hover,
+.pdf-button:hover {
+    background-color: #0099cc;
+}
